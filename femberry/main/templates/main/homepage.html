@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to My Website</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main/css/homepage.css' %}">
+</head>
+<body>
+    <header>
+        <h1 id="welcome">Welcome, {{ user.username }}</h1>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="{% url 'logout' %}">Log-out</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </nav>
+    <section class="aboutus">
+        <h2>About Us</h2>
+        <p>Welcome to our website. We provide excellent services...</p>
+    </section>
+    <div class="homepage-container">
+        <div class="homepage">
+            <div class="profilebar">
+                <div class="editButton">
+                    <a href="{% url 'edit_user_profile' %}">Edit Profile</a>
+                </div>
+                
+                <div id="profilephoto">
+                    {% if user_detail.profilephoto %}
+                        <img src="{{ user_detail.profilephoto.url }}" alt="Profile Photo" class="profile-photo">
+                    {% else %}
+                        <img src="https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_640.png" alt="Default Profile Photo" class="profile-photo">
+                    {% endif %}
+                </div>
+                <div id="username">
+                    {{ user.first_name }} {{ user.last_name }}
+                </div>
+                <div id="userbio">
+                    {{ user_detail.bio }}
+                </div>
+                <div id="newpostsend">
+                    <button id="textPostButton" onclick="openPopup('textPostPopup')">Text Post</button>
+                    <button id="photoPostButton" onclick="openPopup('photoPostPopup')">Photo Post</button>
+                    
+                    <div id="textPostPopup" class="popup">
+                        <button class="close" onclick="closePopup('textPostPopup')">&times;</button>
+                        <h2>Share your idea..</h2>
+                        <form action="{% url 'new-post-send' %}" method="post" id="textPostForm" onsubmit="return submitForm('textPostPopup')">
+                            {% csrf_token %}
+                            <textarea id="textContent" name="title" rows="4" cols="50" placeholder="Write something..."></textarea><br>
+                            <button type="submit">Send</button>
+                        </form>
+                    </div>
+                    
+                    <div id="photoPostPopup" class="popup">
+                        <button class="close" onclick="closePopup('photoPostPopup')">&times;</button>
+                        <h2>Share an excellent photo..</h2>
+                        <form action="{% url 'photo-post-send' %}" method="post" enctype="multipart/form-data" id="photoPostForm" onsubmit="return submitForm('photoPostPopup')">
+                            {% csrf_token %}
+                            <input type="file" id="photoFile" name="photo"><br>
+                            <input type="text" id="photoTitle" name="title" placeholder="Title"><br>
+                            <button type="submit">Send</button>
+                        </form>
+                    </div>
+                </div>
+                <div id="mymood">
+                </div>
+            </div>
+
+            <div class="mainboard">
+                <div class="searchBar"></div>
+                <div class="posts">
+                    {% for post in posts %}
+                    <div class="postInfo">
+                        <div class="post-metadata">
+                            <span class="post-author">{{ post.user.username }}</span>
+                            {% if post.is_owner %}
+                                <form method="post" action="{% url 'delete-one-post' %}" class="delete-post-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                                    <button type="submit" class="delete-post-button">✖</button>
+                                </form>
+                            {% endif %}
+                            <div class="post-content">
+                                <h3>{{ post.title }}</h3>
+                                {% if post.photo_data %}
+                                    <img src="{{ post.photo_data }}" alt="Post Photo" style="max-width: 100%;">
+                                {% endif %}
+                                <span class="post-date">posted on {{ post.post_date }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="friendslist">
+                <div class="friends-buttons">
+                    <button id="openSearchPopupButton" onclick="openPopup('searchFriendPopup')">ADD NEW FRIEND &#10051</button>
+                    <button id="openFriendRequestsPopupButton" onclick="openPopup('friendRequestsPopup')">FRIEND REQUESTS &#128100;</button>
+                </div>
+
+                <div id="searchFriendPopup" class="popup">
+                    <div class="close" onclick="closePopup('searchFriendPopup')">✖</div>
+                    <form id="searchFriendForm" method="POST" action="{% url 'search-person' %}">
+                        {% csrf_token %}
+                        <input type="text" id="searchQuery" name="searchQuery" placeholder="Enter username, first name, or last name">
+                        <button type="submit">SEARCH</button>
+                    </form>
+                    <div id="searchResults"></div>
+                </div>
+                
+                <div id="friendRequestsPopup" class="popup">
+                    <div class="close" onclick="closePopup('friendRequestsPopup')">✖</div>
+                    <h2>Friend Requests</h2>
+                    <div id="friendRequestsContainer">
+                        {% for request in friendrequests %}
+                            <div class="friend-request" data-request-id="{{ request.id }}">
+                                <span>{{ request.user.username }}</span>
+                                <button onclick="respondToRequest(this, 'accepted')">Accept</button>
+                                <button onclick="respondToRequest(this, 'rejected')">Reject</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="friend-list">
+                    <h2>Friends List</h2>
+                    {% for friend in friends %}
+                        <div class="friend">
+                            <span>{{ friend.username }}</span>
+                            <span>{{ friend.first_name }}</span>
+                            <span>{{ friend.last_name }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function openPopup(popupId) {
+            document.getElementById(popupId).classList.add('active');
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).classList.remove('active');
+        }
+
+       
+
+        function submitFormByPopupId(popupId) {
+            var form = document.getElementById(popupId).querySelector('form');
+            var formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (popupId === 'searchFriendPopup') {
+                    renderSearchResults(data.matching_usernames);
+                } else {
+                    // Diğer popup'lara göre işlem yapılabilir
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+            return false; // Formun normal submit işlemi engellenir
+        }
+
+    
+        function respondToRequest(button, action) {
+            var requestElement = button.closest('.friend-request');
+            var requestId = requestElement.getAttribute('data-request-id');
+            
+            fetch("{% url 'respond-friend-request' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    request_id: requestId,
+                    action: action
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    requestElement.remove();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+
+
+
+    document.getElementById('searchFriendForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var formData = new FormData(this);
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        renderResults(data.matching_users);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+
+function renderResults(users) {
+    var resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = ''; // Clear previous results
+
+    if (users.length === 0) {
+        resultsContainer.textContent = 'No matching users found.';
+    } else {
+        var list = document.createElement('ul');
+        users.forEach(function(user) {
+            var listItem = document.createElement('li');
+            var button = document.createElement('button');
+            button.textContent = 'Send Request';
+
+            if (user.status !== 'rejected' && user.status !== 'none') {
+                button.disabled = true; // Disable button if not 'rejected' or no request
+                button.textContent = user.status.charAt(0).toUpperCase() + user.status.slice(1); // Show status
+            }
+
+            button.onclick = function() {
+                sendFriendship(user.username); 
+            };
+            listItem.textContent = user.username + ' ';
+            listItem.appendChild(button); 
+            list.appendChild(listItem); 
+        });
+        resultsContainer.appendChild(list); 
+    }
+}
+
+
+
+function sendFriendship(username) {
+    window.location.href = "{% url 'send-friendship' %}?username=" + encodeURIComponent(username);
+}
+
+
+    </script>
+</body>
+</html>

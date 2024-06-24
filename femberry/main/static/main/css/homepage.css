@@ -1,0 +1,303 @@
+:root {
+    --light-green: #defcf9;
+    --light-blue: #cadefc;
+    --light-purple: #c3bef0;
+    --light-pink: #cca8e9;
+    --dark1: #3e4a61;
+    --dark2: #1a2639;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: var(--light-blue);
+    padding: 20px;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#welcome {
+    color: #212022;
+    margin-top: -5px;
+    font-size: 5vh;
+}
+
+nav {
+    background-color: var(--light-green);
+    padding: 10px;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
+
+.aboutus {
+    background-color: var(--light-green);
+    padding: 20px;
+}
+
+.homepage-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.homepage {
+    display: flex;
+    flex: 1;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+.mainboard,
+.profilebar,
+.friendslist {
+    background-color: #fff;
+    padding: 20px;
+    margin: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profilebar,
+.friendslist {
+    flex: 2;
+}
+
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.mainboard {
+    flex: 5;
+}
+
+footer {
+    background-color: var(--light-green);
+    padding: 10px;
+    text-align: center;
+    height: 40px;
+}
+
+/* Styles for popups */
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: #fff;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 80%; /* Adjust the maximum width as needed */
+    max-height: 80%; /* Adjust the maximum height as needed */
+    overflow: auto; /* Add scrollbars if content overflows */
+}
+
+/* Adjust the close button position */
+.popup .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+/* Add margin to the buttons in the friend search section */
+.searchperson button {
+    margin-top: 10px; /* Adjust the margin as needed */
+}
+
+/* Adjust the alignment of the buttons */
+#openSearchPopupButton {
+    margin-top: 10px; /* Adjust the margin as needed */
+}
+
+.popup.active {
+    display: block;
+}
+
+/* Additional styling for popup content */
+.popup-content {
+    margin-top: 10px;
+}
+
+/* Styling for popup buttons */
+.popup button {
+    padding: 10px 20px;
+    background-color: var(--light-blue);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+.popup button:hover {
+    background-color: #4a90e2;
+}
+
+
+#searchFriendPopup.popup {
+    width: 340px; /* Adjust the width as needed */
+    height: 100px;
+}
+
+/* Adjust the position of X button */
+#searchFriendPopup .close {
+    width: 30px;
+    height: 30px;
+    top: 5px;
+    left: 5px;
+}
+
+/* Adjust the margin between X button and Search button */
+#searchFriendPopup .close,
+#searchFriendPopup #openSearchPopupButton {
+    margin-top: 10px; /* Adjust the margin as needed */
+}
+
+
+/* Stil for the first friend-list */
+.friendslist .friend-list {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.friendslist .friend-list h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.friendslist .friend {
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.friendslist .friend span {
+    margin-right: 10px;
+}
+
+/* Stil for the second friend-list */
+.friendrequests .friend-list {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.friendrequests .friend-list h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.friendrequests .friend {
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.friendrequests .friend span {
+    margin-right: 10px;
+}
+
+
+/* Styles for search bar */
+.searchBar {
+    background-color: #f0f0f0; /* Light gray */
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Styles for posts container */
+.posts {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Styles for individual post */
+.postInfo {
+    border: 1px solid #ddd; /* Light gray border */
+    padding: 20px;
+}
+
+/* Styles for post metadata */
+.post-metadata {
+    margin-bottom: 10px;
+}
+
+/* Styles for post author */
+.post-author {
+    font-weight: bold;
+}
+
+/* Styles for post content */
+.post-content {
+    margin-top: 10px;
+}
+
+/* Styles for post title */
+.post-content h3 {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+/* Styles for post image */
+.post-content img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+}
+
+/* Styles for post date */
+.post-date {
+    color: #666; /* Dark gray */
+    font-size: 14px;
+}
+
+
+.delete-post-form {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.delete-post-button {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 18px;
+    cursor: pointer;
+}

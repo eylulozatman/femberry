@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to My Website</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main/css/index.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to FEMBERRY</h1>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="#" class="button">Contact</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section>
+                <h2>About Femberry</h2>
+                <p>Share, like, have fun... Only for girls</p>
+            </section>
+            
+            <!-- Login and Register buttons -->
+            <section class="authTab">
+                <h2>Account</h2>
+                <a href="{% url 'login' %}" class="button">Login</a>
+                <a href="{% url 'register' %}" class="button">Register</a>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 My Website. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
