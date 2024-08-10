@@ -1,0 +1,60 @@
+
+:root {
+    --light-green: #defcf9;
+    --light-blue: #cadefc;
+    --light-purple: #c3bef0;
+    --light-pink: #cca8e9;
+    --dark1: #3e4a61;
+    --dark2: #1a2639;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--light-blue); /* Background color */
+    margin: 0;
+    padding: 0;
+    display: flex; /* Add this */
+    flex-direction: column;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Ensure the body takes up the full viewport height */
+
+}
+
+.navbar {
+    width: 100%;
+    background-color: #3e4a61;
+    color: #defcf9;
+    position: fixed; /* Sabit pozisyon */
+    top: 0; /* Sayfanın tepesinde */
+    left: 0;
+    z-index: 1000; /* Diğer içeriklerin üstünde kalması için */
+    padding: 15px 0; /* Yatay padding */
+    text-align: center; /* İçeriği ortalamak için */
+}
+.contactdiv {
+    width: 55vh;
+    height: 30vh;
+    background-color: aliceblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10%;
+}
+
+.attspan{
+   
+    border-radius: 3%;
+    background-color: #c3bef0;
+    margin: 30px;
+    padding: 10px;
+ 
+}
+#adresslink {
+        background-color: aliceblue;
+}
+
+.backbtn {
+
+    cursor: pointer;
+}

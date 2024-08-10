@@ -8,16 +8,18 @@
     <link rel="stylesheet" href="{% static 'main/css/index.css' %}">
 </head>
 <body>
-    <div class="container">
+   
         <header>
             <h1>Welcome to FEMBERRY</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="{% url 'contact' %}" class="button">Contact</a></li>
+                </ul>
+            </nav>
         </header>
         
-        <nav>
-            <ul>
-                <li><a href="#" class="button">Contact</a></li>
-            </ul>
-        </nav>
+       
         
         <main>
             <section>
@@ -36,6 +38,6 @@
         <footer>
             <p>&copy; 2024 My Website. All rights reserved.</p>
         </footer>
-    </div>
+   
 </body>
 </html>

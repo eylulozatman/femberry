@@ -12,10 +12,20 @@ body {
     background-color: var(--light-purple); /* Background color */
     margin: 0;
     padding: 0;
-    display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+
+}
+
+.registerdiv {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    
 }
 
 header {
@@ -31,18 +41,21 @@ main {
 }
 
 form {
-    background-color: #fff;
+   
     padding: 1rem;
     border: 1px solid #ddd;
     display: inline-block;
+    border-radius: 1%;
+    box-shadow: #1a2639;
+    background-color: #cadefc;
 }
 
 button {
     padding: 0.5rem 1rem;
     margin-top: 1rem;
     cursor: pointer;
-    background-color: var(--light-green); /* Button background color */
-    color: #fff;
+    background-color: var(--light-pink); /* Button background color */
+    color: var(--dark2);
     border: none;
 }
 

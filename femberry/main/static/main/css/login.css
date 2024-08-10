@@ -12,13 +12,21 @@ body {
     background-color: var(--light-purple); /* Background color */
     margin: 0;
     padding: 0;
+    height: 100vh;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
+.logindiv {
 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  
+
+}
 header {
-    background-color: var(--light-blue); /* Header background color */
+    background-color: var(--dark1); /* Header background color */
     color: #fff;
     padding: 1rem;
     text-align: center;
@@ -30,19 +38,37 @@ main {
 }
 
 form {
-    background-color: #fff;
-    padding: 1rem;
-    border: 1px solid #ddd;
+   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #cca8e9;
+    padding: 8%;
+    box-shadow: #1a2639;
+    border-radius: 5%;
     display: inline-block;
+
+}
+
+input  {
+
+    padding: 5%;
+    border-radius: 5%;
+    box-shadow: #defcf9;
 }
 
 button {
-    padding: 0.5rem 1rem;
+
+    padding: 5%;
     margin-top: 1rem;
     cursor: pointer;
-    background-color: var(--dark2); /* Button background color */
-    color: #fff;
+    background-color: var(--dark1); /* Button background color */
+    color: #ece8e8;
     border: none;
+}
+button:hover  {
+
+    background-color: #1a2639;
 }
 
 a {

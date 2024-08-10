@@ -19,12 +19,10 @@
             <li><a href="#">About</a></li>
             <li><a href="#">Services</a></li>
             <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'poll-page' %}">Polls</a></li>
         </ul>
     </nav>
-    <section class="aboutus">
-        <h2>About Us</h2>
-        <p>Welcome to our website. We provide excellent services...</p>
-    </section>
+  
     <div class="homepage-container">
         <div class="homepage">
             <div class="profilebar">
@@ -46,8 +44,8 @@
                     {{ user_detail.bio }}
                 </div>
                 <div id="newpostsend">
-                    <button id="textPostButton" onclick="openPopup('textPostPopup')">Text Post</button>
-                    <button id="photoPostButton" onclick="openPopup('photoPostPopup')">Photo Post</button>
+                    <button  class="btn"  id ="textPostButton" onclick="openPopup('textPostPopup')">Text Post</button>
+                    <button class="btn"  id="photoPostButton" onclick="openPopup('photoPostPopup')">Photo Post</button>
                     
                     <div id="textPostPopup" class="popup">
                         <button class="close" onclick="closePopup('textPostPopup')">&times;</button>
@@ -75,36 +73,79 @@
             </div>
 
             <div class="mainboard">
-                <div class="searchBar"></div>
+                <div class="searchBar">
+                    <form id="searchForm" method="POST" action="{% url 'search-post' %}">
+                        {% csrf_token %}
+                        <input type="text" name="searchQuery" placeholder="Enter search term">
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
+
+                <div class="just-friends-div">
+                    <button type="button" class="btn {% if user_pref.postsFromFriends %}userPrefSelected{% endif %}"
+                        id="just-friends-btn"
+                        onclick="SetPostsFromFriends()">
+                        <span>Just Friends</span>
+                    </button>
+                </div>
+                
+                
+                
                 <div class="posts">
                     {% for post in posts %}
                     <div class="postInfo">
                         <div class="post-metadata">
+                            <div class="post-edit-del">
+                                <button type="button" class="edit-del-menu" onclick="toggleEditDelete('{{ post.id }}')">...</button>
+                                <div id="edit-delete-menu-{{ post.id }}" class="edit-delete-menu" style="display: none;">
+                                    {% if post.is_owner %}
+                                    <button type="button" onclick="editPost('{{ post.id }}')">Edit</button>
+                                    <form id="edit-post-form-{{ post.id }}" method="post" action="{% url 'edit-one-post' %}" style="display: none;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                                        <input type="hidden" name="newText" id="new-text-{{ post.id }}">
+                                        <button type="submit">Save</button>
+                                    </form>
+                                    <form method="post" action="{% url 'delete-one-post' %}" class="delete-post-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                                        <button type="submit">Delete</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            
                             <span class="post-author">{{ post.user.username }}</span>
-                            {% if post.is_owner %}
-                                <form method="post" action="{% url 'delete-one-post' %}" class="delete-post-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="post_id" value="{{ post.id }}">
-                                    <button type="submit" class="delete-post-button">✖</button>
-                                </form>
-                            {% endif %}
                             <div class="post-content">
-                                <h3>{{ post.title }}</h3>
+                                <h3 id="post-title-{{ post.id }}" contenteditable="false">{{ post.title }}</h3>
                                 {% if post.photo_data %}
-                                    <img src="{{ post.photo_data }}" alt="Post Photo" style="max-width: 100%;">
+                                    <img src="{{post.photo_data}}" alt="photo image">
+                            
                                 {% endif %}
-                                <span class="post-date">posted on {{ post.post_date }}</span>
+                            </div>
+
+                            <div class="likediv">
+                                <button type="button" id="likebtn-{{ post.id }}" class="like-button {% if post.is_liked %}liked{% else %}not-liked{% endif %}" onclick="postlike('{{ post.id }}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                                    </svg>
+                                </button>                                
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
+                {% endfor %}
+                
+                
+                    
+                    
                 </div>
             </div>
             
             <div class="friendslist">
                 <div class="friends-buttons">
-                    <button id="openSearchPopupButton" onclick="openPopup('searchFriendPopup')">ADD NEW FRIEND &#10051</button>
-                    <button id="openFriendRequestsPopupButton" onclick="openPopup('friendRequestsPopup')">FRIEND REQUESTS &#128100;</button>
+                    <button class="btn" id="openSearchPopupButton" onclick="openPopup('searchFriendPopup')">ADD NEW FRIEND &#10051</button>
+                    <button class="btn" id="openFriendRequestsPopupButton" onclick="openPopup('friendRequestsPopup')">FRIEND REQUESTS &#128100;</button>
                 </div>
 
                 <div id="searchFriendPopup" class="popup">
@@ -117,153 +158,42 @@
                     <div id="searchResults"></div>
                 </div>
                 
-                <div id="friendRequestsPopup" class="popup">
+                <div id="friendRequestsPopup" class="popup" data-respond-friend-request-url="{% url 'respond-friend-request' %}">
                     <div class="close" onclick="closePopup('friendRequestsPopup')">✖</div>
                     <h2>Friend Requests</h2>
                     <div id="friendRequestsContainer">
-                        {% for request in friendrequests %}
-                            <div class="friend-request" data-request-id="{{ request.id }}">
-                                <span>{{ request.user.username }}</span>
-                                <button onclick="respondToRequest(this, 'accepted')">Accept</button>
-                                <button onclick="respondToRequest(this, 'rejected')">Reject</button>
-                            </div>
-                        {% endfor %}
+                        {% if friendrequests %}
+                            {% for request in friendrequests %}
+                                <div class="friend-request" data-request-id="{{ request.id }}">
+                                    <span>{{ request.user.username }}</span>
+                                    <button onclick="respondToRequest(this, 'accepted')">Accept</button>
+                                    <button onclick="respondToRequest(this, 'rejected')">Reject</button>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>There is no any request.</p>
+                        {% endif %}
                     </div>
                 </div>
+                
 
                 <div class="friend-list">
                     <h2>Friends List</h2>
                     {% for friend in friends %}
                         <div class="friend">
                             <span>{{ friend.username }}</span>
-                            <span>{{ friend.first_name }}</span>
-                            <span>{{ friend.last_name }}</span>
+                           
                         </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-    
-    <script>
-        function openPopup(popupId) {
-            document.getElementById(popupId).classList.add('active');
-        }
+    <section class="aboutus">
+        <h2>About Us</h2>
+        <p>Welcome to our website. We provide excellent services...</p>
+    </section>
 
-        function closePopup(popupId) {
-            document.getElementById(popupId).classList.remove('active');
-        }
-
-       
-
-        function submitFormByPopupId(popupId) {
-            var form = document.getElementById(popupId).querySelector('form');
-            var formData = new FormData(form);
-
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (popupId === 'searchFriendPopup') {
-                    renderSearchResults(data.matching_usernames);
-                } else {
-                    // Diğer popup'lara göre işlem yapılabilir
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-            return false; // Formun normal submit işlemi engellenir
-        }
-
-    
-        function respondToRequest(button, action) {
-            var requestElement = button.closest('.friend-request');
-            var requestId = requestElement.getAttribute('data-request-id');
-            
-            fetch("{% url 'respond-friend-request' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    request_id: requestId,
-                    action: action
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    requestElement.remove();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-
-
-
-
-    document.getElementById('searchFriendForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    var formData = new FormData(this);
-    fetch(this.action, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        renderResults(data.matching_users);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
-
-function renderResults(users) {
-    var resultsContainer = document.getElementById('searchResults');
-    resultsContainer.innerHTML = ''; // Clear previous results
-
-    if (users.length === 0) {
-        resultsContainer.textContent = 'No matching users found.';
-    } else {
-        var list = document.createElement('ul');
-        users.forEach(function(user) {
-            var listItem = document.createElement('li');
-            var button = document.createElement('button');
-            button.textContent = 'Send Request';
-
-            if (user.status !== 'rejected' && user.status !== 'none') {
-                button.disabled = true; // Disable button if not 'rejected' or no request
-                button.textContent = user.status.charAt(0).toUpperCase() + user.status.slice(1); // Show status
-            }
-
-            button.onclick = function() {
-                sendFriendship(user.username); 
-            };
-            listItem.textContent = user.username + ' ';
-            listItem.appendChild(button); 
-            list.appendChild(listItem); 
-        });
-        resultsContainer.appendChild(list); 
-    }
-}
-
-
-
-function sendFriendship(username) {
-    window.location.href = "{% url 'send-friendship' %}?username=" + encodeURIComponent(username);
-}
-
-
-    </script>
+<script src="{% static 'main/js/homepage.js' %}"></script>
 </body>
 </html>

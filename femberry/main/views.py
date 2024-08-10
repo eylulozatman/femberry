@@ -9,11 +9,14 @@ from .models import *
 import json
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-
+from django.db.models import OuterRef, Exists
 
 
 def index(request):
     return render(request, 'main/index.html')
+
+def contact_view(request):
+    return render(request, 'main/contact.html')
 
 def register_view(request):
     if request.method == 'POST':
@@ -52,14 +55,40 @@ def logout_view(request):
 def homepage_view(request):
     user = request.user
     user_detail = get_user_details(user)
-    posts = all_post_view(request)  # Tüm post verilerini al
-    postdata = json.loads(posts.content.decode('utf-8'))  # JSON verisini dönüştür
+    post_data = get_posts(request)  # Get all post data
     friendrequests = get_friend_request_view(request)
     friends = get_all_friends_view(request)
+    user_pref, created = UserPref.objects.get_or_create(user=user)
+    
     return render(request, 'main/homepage.html', {
-        'user': user, 
-        'user_detail': user_detail, 
-        'posts': postdata, 
+        'user': user,
+        'user_detail': user_detail,
+        'posts': post_data,
+        'friendrequests': friendrequests,
+        'friends': friends,
+        'user_pref': user_pref 
+    })
+
+
+def poll_page_view(request):
+    return redirect('poll')
+
+@login_required
+def homepage_targetpost_view(request, matching_posts=None):
+    user = request.user
+    user_detail = get_user_details(user)
+    if matching_posts is None:
+        post_data = get_posts(request)  # Tüm post verilerini al
+    else:
+        post_data = matching_posts
+
+    friendrequests = get_friend_request_view(request)
+    friends = get_all_friends_view(request)
+
+    return render(request, 'main/homepage.html', {
+        'user': user,
+        'user_detail': user_detail,
+        'posts': post_data,
         'friendrequests': friendrequests,
         'friends': friends
     })
@@ -115,20 +144,70 @@ def photo_post_send_view(request):
         Post.objects.create(user=request.user, title=title, photo_data=photo)
         return redirect('homepage')
  
+
 @login_required
-def all_post_view(request):
+def get_posts(request, filter_criteria=None):
     current_user = request.user
-    posts = Post.objects.all().order_by('-post_date')[:50]
+
+    # Get or create user preferences
+    user_pref, created = UserPref.objects.get_or_create(user=current_user)
+    
+    # Eğer kullanıcı sadece arkadaşlarının postlarını görmek istiyorsa
+    if user_pref.postsFromFriends:
+        # Arkadaşlar için Subquery kullanarak daha verimli bir sorgu yapın
+        friend_ids = Friend.objects.filter(user=current_user, friend=OuterRef('user_id'))
+        posts = Post.objects.filter(Exists(friend_ids)).order_by('-post_date')[:50]
+        if not posts.exists():
+            posts = [
+                Post(
+                    user=current_user,  
+                    title="Start adding friends!",
+                    post_date=timezone.now(),
+                    photo_data=None
+                )
+            ]
+
+    elif filter_criteria:
+        posts = Post.objects.filter(**filter_criteria).order_by('-post_date')[:50]
+    else:
+        posts = Post.objects.all().order_by('-post_date')[:50]
+
+    # Kullanıcının beğendiği postları ID listesi olarak alın
+    liked_post_ids = LikePost.objects.filter(user_like=current_user).values_list('post_like_id', flat=True)
+
     post_data = [{
         'id': post.id,
         'title': post.title,
         'post_date': format_post_date(post.post_date),
         'photo_data': post.photo_data.url if post.photo_data else None,
         'user': {'username': post.user.username},
-        'is_owner': post.user == current_user
+        'is_owner': post.user == current_user,
+        'is_liked': post.id in liked_post_ids  # Beğenme durumu
     } for post in posts]
-    return JsonResponse(post_data, safe=False)
 
+    return post_data
+
+@login_required
+def update_userPref_view(request):
+    if request.method == 'POST':
+        try:
+            current_user = request.user
+
+            # Get or create user preferences
+            user_pref, created = UserPref.objects.get_or_create(user=current_user)
+
+            # Toggle the postsFromFriends field
+            user_pref.postsFromFriends = not user_pref.postsFromFriends
+            user_pref.save()
+
+            # Return a JSON response with success
+            return JsonResponse({'success': True, 'redirect': 'homepage'}, status=200)
+        except Exception as e:
+            # Return JSON response on error
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    else:
+        # Handle invalid request method
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
 def format_post_date(post_date):
     now = timezone.now()
@@ -159,6 +238,23 @@ def delete_one_post_view(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
+@login_required
+def edit_one_post_view(request):
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        new_text = request.POST.get('newText')
+
+        post = get_object_or_404(Post, id=post_id)
+
+        # Check if the logged-in user is the owner of the post
+        if post.user != request.user:
+            return JsonResponse({'error': 'Invalid request'}, status=403)  # Use 403 Forbidden
+
+        post.title = new_text
+        post.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
 def search_person_view(request):
     if request.method == 'POST':
         target_word = request.POST.get('searchQuery', '')
@@ -185,21 +281,20 @@ def search_person_view(request):
             'matching_users': matching_data,
         }
         return JsonResponse(data)
-    
+ 
 @login_required
-def send_friendship_view(request):
-    if request.method == 'GET':
-        username = request.GET.get('username')
-        if username:
-            try:
-                user = User.objects.get(username=username)
-                # Check if there is an existing friend request
-                existing_request = FriendRequest.objects.filter(user=request.user, requested=user).exists()
-                if not existing_request:
-                    FriendRequest.objects.create(user=request.user, requested=user)
-            except User.DoesNotExist:
-                pass
-    return JsonResponse({'status': 'success'})  # Return success status
+def send_friendship_view(request, username):
+    if request.method == 'POST':
+        try:
+            user = User.objects.get(username=username)
+            # Check if there is an existing friend request
+            existing_request = FriendRequest.objects.filter(user=request.user, requested=user).exists()
+            if not existing_request:
+                FriendRequest.objects.create(user=request.user, requested=user)
+            return JsonResponse({'status': 'success'})
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'User does not exist'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
 @login_required
 def get_friend_request_view(request):
@@ -225,10 +320,13 @@ def get_all_friends_view(request):
 @login_required
 def respond_to_request_view(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        request_id = data.get('request_id')
-        action = data.get('action')
         try:
+            data = json.loads(request.body)
+            request_id = data.get('request_id')
+            action = data.get('action')
+            if not request_id or not action:
+                return JsonResponse({'success': False, 'error': 'Missing parameters'}, status=400)
+                
             friend_request = FriendRequest.objects.get(id=request_id)
             if action == 'accepted':
                 friend_request.status = 'accepted'
@@ -236,8 +334,48 @@ def respond_to_request_view(request):
                 Friend.objects.create(user=friend_request.user, friend=request.user)
             elif action == 'rejected':
                 friend_request.status = 'rejected'
+            else:
+                return JsonResponse({'success': False, 'error': 'Invalid action'}, status=400)
+            
             friend_request.save()
             return JsonResponse({'success': True})
         except FriendRequest.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Request does not exist'})
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+            return JsonResponse({'success': False, 'error': 'Request does not exist'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+@login_required
+def search_post_view(request):
+    if request.method == 'POST':
+        target_word = request.POST.get('searchQuery', '')
+        matching_posts = get_posts(request, filter_criteria={'title__icontains': target_word})
+        return homepage_targetpost_view(request, matching_posts)
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+@login_required
+def like_post_view(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    
+    # Check if the user already liked the post
+    if LikePost.objects.filter(user_like=request.user, post_like=post).exists():
+        # If the like already exists, return a JSON response indicating the post is already liked
+        return JsonResponse({'status': 'already_liked'}, status=200)
+    
+    # Otherwise, create a new like
+    LikePost.objects.create(user_like=request.user, post_like=post)
+      
+    return JsonResponse({'status': 'liked'}, status=200)
+
+@login_required
+def unlike_post_view(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    
+    # Check if the user has liked the post
+    like = LikePost.objects.filter(user_like=request.user, post_like=post)
+    
+    if like.exists():
+        like.delete()
+    
+    return JsonResponse({'status': 'unliked'}, status=200)

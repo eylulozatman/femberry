@@ -9,12 +9,15 @@
     <title>Register</title>
 </head>
 <body>
-    <h1>Register</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
-    </form>
-    <a href="{% url 'login' %}">Already have an account? Login here.</a>
+    <div class="registerdiv">
+        <h1>Register</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Register</button>
+        </form>
+        <a href="{% url 'login' %}">Already have an account? Login here.</a>
+    </div>
+   
 </body>
 </html>

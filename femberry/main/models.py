@@ -9,6 +9,11 @@ class UserDetail(models.Model):
     birthday = models.DateField(blank=True, null=True)
 
 
+class UserPref(models.Model):
+    user = models.ForeignKey(User, related_name='user_prefs', on_delete=models.CASCADE)
+    postsFromFriends = models.BooleanField(default=False)
+
+
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -30,3 +35,7 @@ class FriendRequest(models.Model):
 class Friend(models.Model):
     user = models.ForeignKey(User, related_name='friends', on_delete=models.CASCADE)
     friend = models.ForeignKey(User, related_name='friends_with', on_delete=models.CASCADE)
+
+class LikePost(models.Model):
+    user_like = models.ForeignKey(User, related_name='user_like', on_delete=models.CASCADE)
+    post_like = models.ForeignKey(Post, related_name='post_like', on_delete=models.CASCADE)
