@@ -1,21 +1,43 @@
 :root {
-    --light-green: #defcf9;
-    --light-blue: #cadefc;
-    --light-purple: #c3bef0;
+    --light-green: #91DDCF;
+    --pink: #F19ED2;
+    --light-purple: #E8C5E5;
     --light-pink: #cca8e9;
     --dark1: #3e4a61;
     --dark2: #1a2639;
+    --green: #91DDCF;
+    --purple: #7469B6;
 }
 
 body {
     font-family: Arial, sans-serif;
-    background-color: var(--light-purple); /* Background color */
+    background-color: var(--pink); /* Background color */
     margin: 0;
     padding: 0;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
+    display: flex; /* Add this */
+    flex-direction: column;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Ensure the body takes up the full viewport height */
+
 }
+
+.navbar {
+    width: 100%;
+    background-color: var(--light-green);
+    color: #000000;
+    position: fixed; /* Sabit pozisyon */
+    top: 0; /* Sayfanın tepesinde */
+    left: 0;
+    z-index: 1000; /* Diğer içeriklerin üstünde kalması için */
+    padding: 15px 0; /* Yatay padding */
+    text-align: center; /* İçeriği ortalamak için */
+}
+.backbtn {
+    font-family: 'Poppins';font-size: 22px;
+    cursor: pointer;
+}
+
 .logindiv {
 
     display: flex;
@@ -23,7 +45,6 @@ body {
     align-items: center;
     justify-content: center;
   
-
 }
 header {
     background-color: var(--dark1); /* Header background color */
@@ -32,18 +53,15 @@ header {
     text-align: center;
 }
 
-main {
-    padding: 2rem;
-    text-align: center;
-}
 
 form {
-   
+    font-family: 'Poppins';font-size: 16px;
+     /* border: 2px solid var(--dark2); */
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #cca8e9;
-    padding: 8%;
+    background-color: var(--light-purple);
+    padding: 28%;
     box-shadow: #1a2639;
     border-radius: 5%;
     display: inline-block;

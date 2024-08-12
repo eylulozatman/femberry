@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to My Website</title>
     {% load static %}
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'main/css/homepage.css' %}">
 </head>
 <body>
@@ -14,7 +15,7 @@
     
     <nav>
         <ul>
-            <li><a href="#">Home</a></li>
+            <li><a href="{% url 'homepage' %}">Home</a></li>
             <li><a href="{% url 'logout' %}">Log-out</a></li>
             <li><a href="#">About</a></li>
             <li><a href="#">Services</a></li>
@@ -26,7 +27,7 @@
     <div class="homepage-container">
         <div class="homepage">
             <div class="profilebar">
-                <div class="editButton">
+                <div class="btn">
                     <a href="{% url 'edit_user_profile' %}">Edit Profile</a>
                 </div>
                 
@@ -127,8 +128,8 @@
 
                             <div class="likediv">
                                 <button type="button" id="likebtn-{{ post.id }}" class="like-button {% if post.is_liked %}liked{% else %}not-liked{% endif %}" onclick="postlike('{{ post.id }}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-suit-heart-fill" viewBox="0 0 16 16">
+                                        <path d="M4 1c2.21 0 4 1.755 4 3.92C8 2.755 9.79 1 12 1s4 1.755 4 3.92c0 3.263-3.234 4.414-7.608 9.608a.513.513 0 0 1-.784 0C3.234 9.334 0 8.183 0 4.92 0 2.755 1.79 1 4 1"/>
                                     </svg>
                                 </button>                                
                             </div>
@@ -176,16 +177,20 @@
                     </div>
                 </div>
                 
-
                 <div class="friend-list">
                     <h2>Friends List</h2>
                     {% for friend in friends %}
-                        <div class="friend">
+                        <div class="one-friend">
                             <span>{{ friend.username }}</span>
-                           
+                            <button class="btn" id="visitBtn" onclick="visitUser('{{ friend.id }}')">Visit &#9992;</button>
+                            <button class="btn" id="deleteBTn" onclick="deleteFriend('{{ friend.id }}')">
+                             <i class="material-icons">&#xe872;</i>
+                            </button>
                         </div>
                     {% endfor %}
                 </div>
+                
+                
             </div>
         </div>
     </div>

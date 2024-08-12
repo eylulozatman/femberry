@@ -5,10 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <link rel="stylesheet" href="{% static 'main/css/login.css' %}">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 
     <title>Login</title>
 </head>
 <body>
+
+
+    <div class="navbar">
+        <span class="backbtn" onclick="window.location.href='/'"> 
+            &#8592; Back to home
+        </span>
+    </div>
   
     <div class="logindiv">
         <h1>Login</h1>
@@ -19,6 +27,8 @@
         </form>
         <a href="{% url 'register' %}">Don't have an account? Register here.</a>
     </div>
+
+
    
    
 </body>

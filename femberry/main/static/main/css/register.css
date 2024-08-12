@@ -1,23 +1,49 @@
 :root {
-    --light-green: #defcf9;
-    --light-blue: #cadefc;
-    --light-purple: #c3bef0;
+    --light-green: #91DDCF;
+    --pink: #F19ED2;
+    --light-purple: #E8C5E5;
     --light-pink: #cca8e9;
     --dark1: #3e4a61;
     --dark2: #1a2639;
+    --green: #91DDCF;
+    --purple: #7469B6;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: var(--light-purple); /* Background color */
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  
+    background-color: var(--pink); /* Background color */
     margin: 0;
     padding: 0;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    display: flex; /* Add this */
+    flex-direction: column;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Ensure the body takes up the full viewport height */
 
 }
 
+label {
+
+    font-size: 19px;
+}
+
+.navbar {
+    width: 100%;
+    background-color: #91DDCF;
+    color: #000000;
+    position: fixed; /* Sabit pozisyon */
+    top: 0; /* Sayfanın tepesinde */
+    left: 0;
+    z-index: 1000; /* Diğer içeriklerin üstünde kalması için */
+    padding: 15px 0; /* Yatay padding */
+    text-align: center; /* İçeriği ortalamak için */
+}
+
+.backbtn {
+
+    cursor: pointer;
+}
 .registerdiv {
 
     display: flex;
@@ -41,20 +67,19 @@ main {
 }
 
 form {
-   
     padding: 1rem;
     border: 1px solid #ddd;
     display: inline-block;
     border-radius: 1%;
     box-shadow: #1a2639;
-    background-color: #cadefc;
+    background-color: #E8C5E5;
 }
 
 button {
     padding: 0.5rem 1rem;
     margin-top: 1rem;
     cursor: pointer;
-    background-color: var(--light-pink); /* Button background color */
+    background-color: #7469B6; /* Button background color */
     color: var(--dark2);
     border: none;
 }
@@ -62,7 +87,7 @@ button {
 a {
     display: block;
     margin-top: 1rem;
-    color: #28a745; /* Link color */
+    color: #7469B6; /* Link color */
     text-decoration: none;
 }
 

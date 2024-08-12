@@ -24,6 +24,9 @@ urlpatterns = [
     path('poll-page/',views.poll_page_view,name = 'poll-page'),
     path('like-post/<int:post_id>/', views.like_post_view, name='like_post'),
     path('unlike-post/<int:post_id>/', views.unlike_post_view, name='unlike_post'),
-    path('update-user-pref/',views.update_userPref_view,name = 'update-user-pref')
+    path('update-user-pref/',views.update_userPref_view,name = 'update-user-pref'),
+    path('visit-user/<int:friendId>/', views.visit_user_view, name='visit_user'),
+    path('delete-friend/<int:friendId>/', views.delete_friend_view, name='delete-friend'),
+
 
 ]

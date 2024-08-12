@@ -255,6 +255,7 @@ def edit_one_post_view(request):
         return JsonResponse({'success': True})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@login_required
 def search_person_view(request):
     if request.method == 'POST':
         target_word = request.POST.get('searchQuery', '')
@@ -262,33 +263,38 @@ def search_person_view(request):
         matching_data = []
 
         for user in matching_users:
-            friend_request = FriendRequest.objects.filter(
-                user=request.user,
-                requested=user
-            ).first()
+            # Arkadaş olup olmadığını kontrol et
+            is_friend = Friend.objects.filter(user=request.user, friend=user).exists() or \
+                        Friend.objects.filter(user=user, friend=request.user).exists()
+            self_user = request.user == user
+            if not is_friend and not self_user:
+                # Arkadaşlık isteği olup olmadığını kontrol et
+                friend_request = FriendRequest.objects.filter(
+                    user=request.user, requested=user
+                ).exists() or FriendRequest.objects.filter(
+                    user=user, requested=request.user
+                ).exists()
 
-            if friend_request:
-                status = friend_request.status
-            else:
-                status = 'none'  # Indicates no friend request exists
+                status = 'waiting' if friend_request else 'none'
 
-            matching_data.append({
-                'username': user.username,
-                'status': status
-            })
+                matching_data.append({
+                    'username': user.username,
+                    'status': status
+                })
 
         data = {
             'matching_users': matching_data,
         }
         return JsonResponse(data)
- 
+
 @login_required
 def send_friendship_view(request, username):
     if request.method == 'POST':
         try:
             user = User.objects.get(username=username)
-            # Check if there is an existing friend request
-            existing_request = FriendRequest.objects.filter(user=request.user, requested=user).exists()
+            # Aynı kullanıcıya daha önce istek gönderilmiş mi kontrol et
+            existing_request = FriendRequest.objects.filter(user=request.user, requested=user).exists() or \
+                               FriendRequest.objects.filter(user=user, requested=request.user).exists()
             if not existing_request:
                 FriendRequest.objects.create(user=request.user, requested=user)
             return JsonResponse({'status': 'success'})
@@ -296,10 +302,11 @@ def send_friendship_view(request, username):
             return JsonResponse({'status': 'error', 'message': 'User does not exist'}, status=404)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
+
 @login_required
 def get_friend_request_view(request):
     user = request.user
-    friend_requests = FriendRequest.objects.filter(requested=user, status='waiting')
+    friend_requests = FriendRequest.objects.filter(requested=user)
     return friend_requests
 
 @login_required
@@ -310,6 +317,7 @@ def get_all_friends_view(request):
     for friend in friends:
         friend_user = friend.friend
         friend_list.append({
+            'id': friend_user.id,
             'username': friend_user.username,
             'first_name': friend_user.first_name,
             'last_name': friend_user.last_name,
@@ -329,21 +337,21 @@ def respond_to_request_view(request):
                 
             friend_request = FriendRequest.objects.get(id=request_id)
             if action == 'accepted':
-                friend_request.status = 'accepted'
                 Friend.objects.create(user=request.user, friend=friend_request.user)
                 Friend.objects.create(user=friend_request.user, friend=request.user)
+                friend_request.delete()  # İstek kabul edildiğinde kaldır
             elif action == 'rejected':
-                friend_request.status = 'rejected'
+                friend_request.delete()  # İstek reddedildiğinde kaldır
             else:
                 return JsonResponse({'success': False, 'error': 'Invalid action'}, status=400)
             
-            friend_request.save()
             return JsonResponse({'success': True})
         except FriendRequest.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Request does not exist'}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
 
 @login_required
 def search_post_view(request):
@@ -379,3 +387,52 @@ def unlike_post_view(request, post_id):
         like.delete()
     
     return JsonResponse({'status': 'unliked'}, status=200)
+
+
+
+@login_required
+def visit_user_view(request, friendId):
+    print(f"Debug: Entered visit_user_view with friendId = {friendId}")
+
+    # Get the friend user object
+    try:
+        friend = get_object_or_404(User, id=friendId)
+        print(f"Debug: Found user with ID = {friendId}")
+    except Exception as e:
+        print(f"Error: Could not find user with ID = {friendId}. Exception: {e}")
+        return render(request, 'main/error.html', {'error_message': 'User not found'})
+
+    # Get the friend's detail
+    friend_detail = get_user_details(friend)
+    if not friend_detail:
+        print(f"Warning: No details found for user with ID = {friendId}")
+        friend_detail = None  # or set to some default value if needed
+
+    # Get the friend's posts
+    try:
+        posts = Post.objects.filter(user=friend).order_by('-post_date')[:50]
+        print(f"Debug: Found {posts.count()} posts for user with ID = {friendId}")
+    except Exception as e:
+        print(f"Error: Could not retrieve posts for user with ID = {friendId}. Exception: {e}")
+        posts = []
+
+    return render(request, 'main/visituser.html', {
+        'friend': friend,
+        'friend_detail': friend_detail,
+        'posts': posts,
+    })
+
+
+@login_required
+def delete_friend_view(request, friendId):
+    if request.method == 'POST':
+        # Check if the current user is friends with the user specified by friendId
+        deleted_count = Friend.objects.filter(user=request.user, friend_id=friendId).delete()[0]
+        Friend.objects.filter(user_id=friendId, friend=request.user).delete()
+
+        if deleted_count > 0:
+            return redirect('homepage')  # Redirect to homepage if successful
+        else:
+            return redirect('homepage')  # Redirect to homepage if no friendship found
+
+    return redirect('homepage')  # Redirect to homepage for invalid request method

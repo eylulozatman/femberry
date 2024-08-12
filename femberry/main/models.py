@@ -20,21 +20,14 @@ class Post(models.Model):
     post_date = models.DateTimeField(auto_now_add=True)
     photo_data = models.ImageField(upload_to='photos/', blank=True, null=True)
 
-
 class FriendRequest(models.Model):
-    STATUS_CHOICES = [
-        ('waiting', 'Waiting'),
-        ('accepted', 'Accepted'),
-        ('rejected', 'Rejected'),
-    ]
-
     user = models.ForeignKey(User, related_name='sent_requests', on_delete=models.CASCADE)
     requested = models.ForeignKey(User, related_name='received_requests', on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='waiting')
 
 class Friend(models.Model):
     user = models.ForeignKey(User, related_name='friends', on_delete=models.CASCADE)
     friend = models.ForeignKey(User, related_name='friends_with', on_delete=models.CASCADE)
+
 
 class LikePost(models.Model):
     user_like = models.ForeignKey(User, related_name='user_like', on_delete=models.CASCADE)

@@ -77,16 +77,16 @@ document.getElementById('searchFriendForm').addEventListener('submit', function(
 event.preventDefault();
 var formData = new FormData(this);
 fetch(this.action, {
-method: 'POST',
-body: formData
-})
-.then(response => response.json())
-.then(data => {
-renderResults(data.matching_users);
-})
-.catch(error => {
-console.error('Error:', error);
-});
+    method: 'POST',
+    body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+    renderResults(data.matching_users);
+    })
+    .catch(error => {
+    console.error('Error:', error);
+    });
 });
 function renderResults(users) {
     var resultsContainer = document.getElementById('searchResults');
@@ -101,8 +101,8 @@ function renderResults(users) {
             var button = document.createElement('button');
             button.textContent = 'Send Request';
 
-            if (user.status !== 'rejected' && user.status !== 'none') {
-                button.disabled = true; // Disable button if not 'rejected' or no request
+            if (user.status !== 'none') {
+                button.disabled = true; // Disable button if request is already sent or accepted
                 button.textContent = user.status.charAt(0).toUpperCase() + user.status.slice(1); // Show status
             }
 
@@ -275,6 +275,35 @@ function SetPostsFromFriends() {
     .catch(error => {
         console.error('Error:', error);
     });
+}
+
+function visitUser(friendId) {
+    window.location.href = `/visit-user/${friendId}/`;
+}
+
+
+function deleteFriend(friendId) {
+    if (confirm('Are you sure you want to delete this friend?')) {
+        fetch(`/delete-friend/${friendId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),  // Function to get CSRF token
+            },
+        })
+        .then(response => {
+            if (response.redirected) {
+                // Redirect to homepage if response is a redirect
+                window.location.href = response.url;
+            } else {
+                alert('An error occurred. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
 }
 
 
