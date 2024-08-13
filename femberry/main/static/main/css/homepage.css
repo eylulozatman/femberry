@@ -1,11 +1,11 @@
 :root {
-    --light-green: #91DDCF;
+    --light-green: #c0eede;
     --pink: #F19ED2;
     --light-purple: #E8C5E5;
     --light-pink: #cca8e9;
     --dark1: #3e4a61;
     --dark2: #1a2639;
-    --green: #91DDCF;
+    --green: #53756e;
     --purple: #7469B6;
 }
 
@@ -237,8 +237,8 @@ footer {
 
 /* Styles for individual post */
 .postInfo {
-    border: 1px  var(--dark2);
-    border-style: dotted;
+    border: 1px  var(--light-pink);
+    border-style:groove;
     padding-left: 4%;
     padding-top: 2%;
     border-radius: 10px;

@@ -3,6 +3,8 @@ from django.contrib.auth import login, authenticate, logout
 from .forms import RegisterForm, LoginForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from .forms import *
 from .models import *
@@ -69,9 +71,6 @@ def homepage_view(request):
         'user_pref': user_pref 
     })
 
-
-def poll_page_view(request):
-    return redirect('poll')
 
 @login_required
 def homepage_targetpost_view(request, matching_posts=None):
@@ -436,3 +435,97 @@ def delete_friend_view(request, friendId):
             return redirect('homepage')  # Redirect to homepage if no friendship found
 
     return redirect('homepage')  # Redirect to homepage for invalid request method
+
+
+def poll_page_view(request):
+    polls = Poll.objects.all()
+    
+    # Kullanıcının daha önce verdiği oyları al
+    user_answers = PollAnswer.objects.filter(user=request.user).values('poll_id', 'answer')
+    
+    # Poll ID ve seçimlerin bir sözlüğünü oluşturun
+    user_answers_dict = {}
+    for answer in user_answers:
+        poll_id = answer['poll_id']
+        option = answer['answer']
+        if poll_id not in user_answers_dict:
+            user_answers_dict[poll_id] = set()
+        user_answers_dict[poll_id].add(option)
+    
+    return render(request, 'main/poll.html', {'polls': polls, 'user_answers': user_answers_dict})
+
+
+
+def create_new_poll_view(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        title = data.get('title')
+        options = data.get('options')
+
+        new_poll = Poll.objects.create(owner=request.user, title=title, options=options)
+    
+        return redirect('poll-page')  # 'poll-page' URL adınız olmalı
+        
+    return render(request, 'main/poll.html')
+
+
+
+def answer_poll_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            poll_id = data.get('poll_id')
+            answer = data.get('answer')
+            
+            poll = Poll.objects.get(id=poll_id)
+            
+            existing_answer = PollAnswer.objects.filter(poll=poll, user=request.user).exists()
+            
+            if existing_answer:
+                return JsonResponse({'success': False, 'error': 'You have already answered this poll'})
+            
+            PollAnswer.objects.create(poll=poll, user=request.user, answer=answer)
+            
+            # Sonuçları hesapla
+            results = calculate_poll_results(poll)
+            
+            return JsonResponse({'success': True, 'results': results})
+        
+        except Poll.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Poll does not exist'})
+        
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'})
+        
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return render(request, 'main/poll.html')
+
+def calculate_poll_results(poll):
+    total_answers = PollAnswer.objects.filter(poll=poll).count()
+    results = {option: 0 for option in poll.options}
+    answers = PollAnswer.objects.filter(poll=poll)
+    
+    for answer in answers:
+        if answer.answer in results:
+            results[answer.answer] += 1
+    
+    for option in results:
+        if total_answers > 0:
+            results[option] = (results[option] / total_answers) * 100
+        else:
+            results[option] = 0
+    
+    return results
+
+
+def results_view(request, poll_id):
+    try:
+        poll = Poll.objects.get(id=poll_id)
+        results = calculate_poll_results(poll)
+        return JsonResponse({'success': True, 'results': results})
+    except Poll.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Poll does not exist'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

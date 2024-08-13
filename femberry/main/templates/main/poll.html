@@ -3,9 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    {% load static %}
+    <title>Poll Page</title>
+    <link rel="stylesheet" href="{% static 'main/css/poll.css' %}">
 </head>
 <body>
-    <h2> poll</h2>
+    <h2>Polls</h2>
+
+    <div class="navbar">
+        <span class="backbtn" onclick="window.location.href='/homepage'"> 
+            &#8592; Back to home
+        </span>
+    </div>
+  
+    <button id="create-poll-btn" onclick="togglePopup()">Create New Poll</button>
+    
+    <div id="polls-container">
+        {% for poll in polls %}
+        <div class="poll">
+            <h3>{{ poll.title }}</h3>
+            <ul>
+                {% for option in poll.options %}
+                <li>
+                    <button 
+                        data-poll-id="{{ poll.id }}"
+                        onclick="answerPoll('{{ poll.id }}', '{{ option }}', this)">
+                        {{ option }}
+                    </button>
+                </li>
+                {% endfor %}
+                
+            </ul>
+            <div id="results-{{ poll.id }}" class="results">
+                <button onclick="getResults('{{ poll.id }}')">Get Results</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="poll-popup" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="togglePopup()">&times;</span>
+            <h3>Create New Poll</h3>
+            <form id="create-poll-form" action="{% url 'create-new-poll' %}" method="POST">
+                {% csrf_token %}
+                <label for="title">Poll Title:</label>
+                <input type="text" id="title" name="title" required><br>
+                
+                <label for="option1">Poll Option 1:</label>
+                <input type="text" id="option1" name="options[]" required><br>
+                
+                <label for="option2">Poll Option 2:</label>
+                <input type="text" id="option2" name="options[]" required><br>
+                
+                <label for="option3">Poll Option 3:</label>
+                <input type="text" id="option3" name="options[]" required><br>
+                
+                <div id="additional-options"></div>
+            
+                <button type="button" onclick="addOption()">+ Add More Option</button><br><br>
+            
+                <button type="submit">Create Poll</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'main/js/polls.js' %}">
+
+
+    const userAnswers = JSON.parse('{{ user_answers|escapejs }}');
+
+    </script>
 </body>
 </html>

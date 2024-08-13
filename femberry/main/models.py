@@ -13,6 +13,17 @@ class UserPref(models.Model):
     user = models.ForeignKey(User, related_name='user_prefs', on_delete=models.CASCADE)
     postsFromFriends = models.BooleanField(default=False)
 
+class Poll(models.Model):
+    owner = models.ForeignKey(User, related_name='polls', on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    options = models.JSONField() 
+
+
+class PollAnswer(models.Model):
+    poll = models.ForeignKey(Poll, related_name='answers', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='poll_answers', on_delete=models.CASCADE)
+    answer = models.CharField(max_length=255)  
+
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
