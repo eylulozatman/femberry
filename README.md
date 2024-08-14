@@ -7,10 +7,10 @@ User interface developed using JavaScript, HTML, and CSS.
 1-Users can add friends and visit other user profiles.
 2-Includes functionality for creating polls and voting.
 3-Allows sharing posts, either as text or with photos.
-*User operations such as profile editing, registration, and login.
-*By clicking the Just Friends button, you can view posts only from the people you’ve added as friends.
-*You can search for posts using keywords through the search bar in the main feed.
-*The application includes the ability to like (favorite) posts.
+4-User operations such as profile editing, registration, and login.
+5-By clicking the Just Friends button, you can view posts only from the people you’ve added as friends.
+6-You can search for posts using keywords through the search bar in the main feed.
+7-The application includes the ability to like (favorite) posts.
 
 
 
@@ -21,13 +21,13 @@ Projenin adı FEMBERRY olup, kadınlara yönelik bir paylaşım alanı sunma ama
 Django framework'ü ile geliştirilmiş bir sosyal medya web uygulaması.
 JavaScript, HTML ve CSS kullanılarak kullanıcı arayüzü geliştirilmiştir.
 
-Kullanıcılar arkadaş ekleyebilir ve diğer kullanıcı profillerini ziyaret edebilir.
-Anket oluşturma ve oy verme işlevselliği sunulmaktadır.
-Metin ya da fotoğraf ekleyerek gönderi (post) paylaşma imkanı.
-Profil düzenleme, kayıt olma ve giriş yapma gibi kullanıcı işlemleri.
-Just Friends butonuna tıklayarak sadece arkadaş eklediğiniz kişilerin gönderilerini görebilirsiniz.
-Ana akıştaki arama kısmından anahtar kelimelerle post araması yapabilirsiniz.
-Gönderileri beğenme (like) özelliği bulunmaktadır.
+1-Kullanıcılar arkadaş ekleyebilir ve diğer kullanıcı profillerini ziyaret edebilir.
+2-Anket oluşturma ve oy verme işlevselliği sunulmaktadır.
+3-Metin ya da fotoğraf ekleyerek gönderi (post) paylaşma imkanı.
+4-Profil düzenleme, kayıt olma ve giriş yapma gibi kullanıcı işlemleri.
+5-Just Friends butonuna tıklayarak sadece arkadaş eklediğiniz kişilerin gönderilerini görebilirsiniz.
+6-Ana akıştaki arama kısmından anahtar kelimelerle post araması yapabilirsiniz.
+7-Gönderileri beğenme (like) özelliği bulunmaktadır.
 
 
 ![Ekran görüntüsü 2024-08-14 135141](https://github.com/user-attachments/assets/eae84025-e33c-4d02-9b51-5d308d7fbab4)
