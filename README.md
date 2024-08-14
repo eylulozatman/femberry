@@ -4,13 +4,13 @@ The project is named FEMBERRY with the intention of providing a sharing space sp
 A social media web application developed using the Django framework.
 User interface developed using JavaScript, HTML, and CSS.
 
-Users can add friends and visit other user profiles.
-Includes functionality for creating polls and voting.
-Allows sharing posts, either as text or with photos.
-User operations such as profile editing, registration, and login.
-By clicking the Just Friends button, you can view posts only from the people you’ve added as friends.
-You can search for posts using keywords through the search bar in the main feed.
-The application includes the ability to like (favorite) posts.
+1-Users can add friends and visit other user profiles.
+2-Includes functionality for creating polls and voting.
+3-Allows sharing posts, either as text or with photos.
+*User operations such as profile editing, registration, and login.
+*By clicking the Just Friends button, you can view posts only from the people you’ve added as friends.
+*You can search for posts using keywords through the search bar in the main feed.
+*The application includes the ability to like (favorite) posts.
 
 
 
